@@ -24,9 +24,9 @@ class SignInPage extends StatelessWidget {
         body: SafeArea(
           bottom: false,
           child: Column(children: [
-            Align(
+            const Align(
               alignment: Alignment.centerRight,
-              child: Padding(padding: const EdgeInsets.fromLTRB(24, 8, 24, 0), child: const LanguageDropdown()),
+              child: Padding(padding: EdgeInsets.fromLTRB(24, 8, 24, 0), child: LanguageDropdown()),
             ),
             const SizedBox(height: 24),
             SvgPicture.asset('assets/images/logo.svg', height: 96),
@@ -106,8 +106,8 @@ class LanguageDropdown extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
-        border: Border.all(color: Colors.white.withOpacity(0.28)),
+        color: Colors.white.withValues(alpha: 0.12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
         borderRadius: BorderRadius.circular(999),
       ),
       child: DropdownButtonHideUnderline(

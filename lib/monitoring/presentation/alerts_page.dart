@@ -83,7 +83,7 @@ class _AlertCard extends StatelessWidget {
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(AppTheme.radiusMd)),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(AppTheme.radiusMd)),
           child: Row(children: [
             Text(formatTemp(eq.temperature), style: AppTheme.numeric(size: 18, color: color)),
             const SizedBox(width: 8),

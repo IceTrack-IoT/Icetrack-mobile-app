@@ -97,7 +97,7 @@ class _Group extends StatelessWidget {
           InkWell(
             onTap: () => onTap(n),
             child: Container(
-              color: n.isRead ? null : AppColors.primaryLight.withOpacity(0.5),
+              color: n.isRead ? null : AppColors.primaryLight.withValues(alpha: 0.5),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 IconCircle(icon: _style(n.kind).$1, color: _style(n.kind).$2, size: 36),

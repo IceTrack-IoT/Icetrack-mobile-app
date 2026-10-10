@@ -35,8 +35,8 @@ class EquipmentPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.danger.withOpacity(0.08),
-                border: Border.all(color: AppColors.danger.withOpacity(0.35)),
+                color: AppColors.danger.withValues(alpha: 0.08),
+                border: Border.all(color: AppColors.danger.withValues(alpha: 0.35)),
                 borderRadius: BorderRadius.circular(AppTheme.radiusLg),
               ),
               child: Row(children: [
@@ -169,7 +169,7 @@ class TemperatureChartPainter extends CustomPainter {
     double y(double v) => size.height - (v - minV) / (maxV - minV) * size.height;
     final ty = y(threshold);
 
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, ty), Paint()..color = AppColors.danger.withOpacity(0.06));
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, ty), Paint()..color = AppColors.danger.withValues(alpha: 0.06));
     final dash = Paint()
       ..color = AppColors.textSubtle
       ..strokeWidth = 1.5;
