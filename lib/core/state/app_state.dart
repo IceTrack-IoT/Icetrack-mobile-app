@@ -5,15 +5,17 @@ import '../../notifications/domain/app_notification.dart';
 import '../../service_requests/domain/service_order.dart';
 import '../../shared/data/mock_data.dart';
 
-/// Single in-memory store for the demo. Each method mirrors a future API call.
+/// In-memory UI state. Orders, equipment, alerts and notifications are still mock data;
+/// they are replaced by backend calls in the next integration steps.
 class AppState extends ChangeNotifier {
   AppState._();
 
   static final AppState instance = AppState._();
 
   String languageCode = 'es';
-  String technicianName = 'Carlos Ramírez';
-  String companyName = 'FrioService S.A.C.';
+  /// Filled from the technician profile after sign-in (Profiles context).
+  String technicianName = '';
+  String technicianSpeciality = '';
   bool isOffline = false;
   bool isAlertPushEnabled = true;
   bool isAssignmentPushEnabled = true;
@@ -37,6 +39,25 @@ class AppState extends ChangeNotifier {
   int get unreadCount => notifications.where((n) => !n.isRead).length;
 
   int countByStatus(OrderStatus status) => orders.where((o) => o.status == status).length;
+
+  String get technicianInitials {
+    final parts = technicianName.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return '';
+    final last = parts.length > 1 ? parts[1][0] : '';
+    return (parts.first[0] + last).toUpperCase();
+  }
+
+  void setTechnician({required String name, required String speciality}) {
+    technicianName = name;
+    technicianSpeciality = speciality;
+    notifyListeners();
+  }
+
+  void clearTechnician() {
+    technicianName = '';
+    technicianSpeciality = '';
+    notifyListeners();
+  }
 
   void setLanguage(String code) {
     languageCode = code;

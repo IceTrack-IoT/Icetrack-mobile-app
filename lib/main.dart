@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
+import 'iam/application/auth_service.dart';
+import 'iam/presentation/session_gate.dart';
 import 'iam/presentation/sign_in_page.dart';
+import 'shared/infrastructure/api_client.dart';
+import 'shared/presentation/app_navigator.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  ApiClient.instance.onSessionExpired = _onSessionExpired;
   runApp(const IceTrackApp());
+}
+
+/// The refresh token could not be renewed: discard the session and ask to sign in again.
+void _onSessionExpired() {
+  AuthService.instance.clearLocalSession();
+  appNavigatorKey.currentState?.pushAndRemoveUntil(
+    MaterialPageRoute(builder: (_) => const SignInPage(sessionExpired: true)),
+    (_) => false,
+  );
 }
 
 class IceTrackApp extends StatelessWidget {
@@ -15,8 +30,9 @@ class IceTrackApp extends StatelessWidget {
     return MaterialApp(
       title: 'IceTrack',
       debugShowCheckedModeBanner: false,
+      navigatorKey: appNavigatorKey,
       theme: AppTheme.light(),
-      home: const SignInPage(),
+      home: const SessionGate(),
     );
   }
 }

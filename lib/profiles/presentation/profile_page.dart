@@ -5,6 +5,7 @@ import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
+import '../../iam/application/auth_service.dart';
 import '../../iam/presentation/sign_in_page.dart';
 import '../../monitoring/presentation/equipment_page.dart';
 
@@ -13,9 +14,10 @@ import '../../monitoring/presentation/equipment_page.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  void _signOut(BuildContext context) {
-    Navigator.of(context, rootNavigator: true)
-        .pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
+  Future<void> _signOut(BuildContext context) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    await AuthService.instance.signOut();
+    navigator.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
   }
 
   void _simulatePush(BuildContext context) {
@@ -78,18 +80,19 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 14),
           AppCard(
             child: Row(children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 28,
                 backgroundColor: AppColors.primary,
-                child: Text('CR', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+                child: Text(app.technicianInitials,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(app.technicianName, style: text.titleMedium),
-                  Text('${tr('technician')} · ${app.companyName}', style: text.bodyMedium?.copyWith(color: AppColors.textMuted)),
+                  Text('${tr('technician')} · ${app.technicianSpeciality}', style: text.bodyMedium?.copyWith(color: AppColors.textMuted)),
                   const SizedBox(height: 4),
-                  Text(tr('googleLinked'), style: text.bodySmall),
+                  Text(AuthService.instance.profile?.email ?? '', style: text.bodySmall),
                 ]),
               ),
             ]),
