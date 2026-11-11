@@ -5,9 +5,11 @@ import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
+import '../../core/i18n/date_format.dart';
 import '../../iam/application/auth_service.dart';
 import '../../iam/presentation/sign_in_page.dart';
 import '../../monitoring/presentation/equipment_page.dart';
+import '../../service_requests/application/service_request_store.dart';
 
 /// Screen 10 · Profile, language and sync (US-23, US-46).
 /// Also hosts demo triggers for the push alert (08) and expired session (11).
@@ -60,7 +62,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 14),
           GoogleButton(label: tr('continueGoogle'), onPressed: () {
             Navigator.of(sheetContext).pop();
-            AppState.instance.syncPending();
+            ServiceRequestStore.instance.syncNow();
           }),
           const SizedBox(height: 10),
           OutlinedButton(onPressed: () => Navigator.of(sheetContext).pop(), child: Text(tr('notNow'))),
@@ -73,6 +75,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Watch(builder: (context) {
       final app = AppState.instance;
+      final store = ServiceRequestStore.instance;
       final text = Theme.of(context).textTheme;
       return SafeArea(
         child: ListView(padding: const EdgeInsets.fromLTRB(24, 16, 24, 24), children: [
@@ -113,9 +116,9 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(height: 10),
           AppCard(
             child: Column(children: [
-              KeyValueRow(icon: Icons.cloud_outlined, label: tr('pendingRecords'), value: '${app.pendingSync.length} ${tr('interventions')}', isNumeric: true),
+              KeyValueRow(icon: Icons.cloud_outlined, label: tr('pendingRecords'), value: '${store.pending.length} ${tr('interventions')}', isNumeric: true),
               const SizedBox(height: 14),
-              KeyValueRow(icon: Icons.schedule, label: tr('lastSync'), value: app.lastSync, isNumeric: true),
+              KeyValueRow(icon: Icons.schedule, label: tr('lastSync'), value: formatTime(store.lastSync), isNumeric: true),
               const SizedBox(height: 8),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
@@ -123,7 +126,10 @@ class ProfilePage extends StatelessWidget {
                 value: app.isOffline,
                 onChanged: app.setOffline,
               ),
-              OutlinedButton(onPressed: app.isOffline ? null : app.syncPending, child: Text(tr('syncNow'))),
+              OutlinedButton(
+                onPressed: app.isOffline || store.isLoading ? null : store.syncNow,
+                child: Text(tr('syncNow')),
+              ),
             ]),
           ),
           const SizedBox(height: 18),

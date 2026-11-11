@@ -5,12 +5,10 @@ import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
-import '../../service_requests/domain/service_order.dart';
-import '../../service_requests/presentation/intervention_page.dart';
-import '../../service_requests/presentation/order_detail_page.dart';
 import '../domain/equipment.dart';
 
 /// Screen 06 · Equipment and telemetry in the field (US-33, US-32).
+/// Still mock data: it is connected to the backend in step 3 (equipment, telemetry and site).
 class EquipmentPage extends StatelessWidget {
   const EquipmentPage({super.key, required this.equipmentId});
 
@@ -23,11 +21,6 @@ class EquipmentPage extends StatelessWidget {
       final eq = app.equipment[equipmentId]!;
       final text = Theme.of(context).textTheme;
       final color = healthColor(eq.health);
-      ServiceOrder? order;
-      for (final o in app.orders) {
-        if (o.equipmentId == eq.id && o.status != OrderStatus.rejected) order = o;
-      }
-      final linked = order;
       return Scaffold(
         appBar: AppBar(title: Text(eq.name)),
         body: ListView(padding: const EdgeInsets.fromLTRB(24, 8, 24, 24), children: [
@@ -102,32 +95,6 @@ class EquipmentPage extends StatelessWidget {
             ]),
           ),
         ]),
-        bottomNavigationBar: linked == null
-            ? null
-            : Container(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-                decoration: const BoxDecoration(color: AppColors.surface, border: Border(top: BorderSide(color: AppColors.border))),
-                child: SafeArea(
-                  top: false,
-                  child: Row(children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => OrderDetailPage(code: linked.code))),
-                        child: Text(tr('order')),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: linked.status == OrderStatus.inProgress
-                            ? () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => InterventionPage(orderCode: linked.code)))
-                            : null,
-                        child: Text(tr('registerIntervention'), textAlign: TextAlign.center),
-                      ),
-                    ),
-                  ]),
-                ),
-              ),
       );
     });
   }

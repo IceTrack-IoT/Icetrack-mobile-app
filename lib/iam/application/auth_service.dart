@@ -4,6 +4,7 @@ import '../../core/state/app_state.dart';
 import '../../profiles/domain/model/technician_profile.dart';
 import '../../profiles/infrastructure/assemblers/technician_profile_assembler.dart';
 import '../../profiles/infrastructure/profiles_api.dart';
+import '../../service_requests/application/service_request_store.dart';
 import '../../shared/infrastructure/api_client.dart';
 import '../../shared/infrastructure/api_config.dart';
 import '../../shared/infrastructure/api_exception.dart';
@@ -90,6 +91,7 @@ class AuthService extends ChangeNotifier {
     user = null;
     profile = null;
     AppState.instance.clearTechnician();
+    await ServiceRequestStore.instance.reset();
     notifyListeners();
   }
 

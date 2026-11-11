@@ -1,56 +1,10 @@
 import '../../monitoring/domain/equipment.dart';
 import '../../notifications/domain/app_notification.dart';
-import '../../service_requests/domain/service_order.dart';
 
-/// Mock data used while the RESTful API integration (TS-06) is pending.
+/// Mock data still used by equipment, alerts and notifications until their
+/// integration steps (service requests already come from the backend).
 class MockData {
   MockData._();
-
-  static List<ServiceOrder> orders() => [
-        ServiceOrder(
-          code: 'OS-1042',
-          equipmentId: 'FH-02',
-          equipmentName: 'Congeladora horizontal FH-02',
-          serviceType: 'Mantenimiento correctivo',
-          siteName: 'Heladería Polar · Miraflores',
-          address: 'Av. Larco 345, Miraflores',
-          scheduledAt: '10:30 a. m.',
-          priority: OrderPriority.high,
-          status: OrderStatus.pending,
-          requestedBy: 'Lucía Torres',
-          contactPhone: '987 654 321',
-          reportedIssue:
-              'El equipo no baja de −12 °C desde la madrugada. El compresor se escucha encendido de forma continua.',
-        ),
-        ServiceOrder(
-          code: 'OS-1038',
-          equipmentId: 'VT-05',
-          equipmentName: 'Vitrina exhibidora VT-05',
-          serviceType: 'Mantenimiento preventivo',
-          siteName: 'Helados Andina · San Isidro',
-          address: 'Calle Las Begonias 520, San Isidro',
-          scheduledAt: '2:00 p. m.',
-          priority: OrderPriority.medium,
-          status: OrderStatus.accepted,
-          requestedBy: 'Marco Salas',
-          contactPhone: '986 112 450',
-          reportedIssue: 'Revisión preventiva trimestral y limpieza de condensador.',
-        ),
-        ServiceOrder(
-          code: 'OS-1031',
-          equipmentId: 'CF-01',
-          equipmentName: 'Cámara de frío CF-01',
-          serviceType: 'Mantenimiento preventivo',
-          siteName: 'Heladería Polar · Surco',
-          address: 'Av. Primavera 1180, Surco',
-          scheduledAt: '4:30 p. m.',
-          priority: OrderPriority.low,
-          status: OrderStatus.inProgress,
-          requestedBy: 'Lucía Torres',
-          contactPhone: '987 654 321',
-          reportedIssue: 'Cambio programado de burletes de puerta.',
-        ),
-      ];
 
   static Map<String, Equipment> equipment() => {
         'FH-02': const Equipment(

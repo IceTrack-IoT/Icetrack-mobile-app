@@ -26,7 +26,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
     if (target == null) return;
     final route = n.kind == NotificationKind.alert
         ? MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: target))
-        : MaterialPageRoute(builder: (_) => OrderDetailPage(code: target));
+        : MaterialPageRoute(
+            builder: (_) => OrderDetailPage(requestId: int.tryParse(target.replaceAll(RegExp(r'\D'), '')) ?? 0));
     Navigator.of(context).push(route);
   }
 

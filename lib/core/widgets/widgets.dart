@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../monitoring/domain/equipment.dart';
-import '../../service_requests/domain/service_order.dart';
+import '../../service_requests/application/service_request_store.dart';
+import '../../service_requests/domain/model/service_request.dart';
+import '../i18n/date_format.dart';
 import '../i18n/app_strings.dart';
-import '../state/app_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 
@@ -33,21 +34,21 @@ class StatusBadge extends StatelessWidget {
 class OrderStatusBadge extends StatelessWidget {
   const OrderStatusBadge({super.key, required this.status});
 
-  final OrderStatus status;
+  final ServiceStatus status;
 
   @override
   Widget build(BuildContext context) {
     switch (status) {
-      case OrderStatus.pending:
+      case ServiceStatus.pending:
         return StatusBadge(label: tr('statusPending'), color: AppColors.accent);
-      case OrderStatus.accepted:
+      case ServiceStatus.accepted:
         return StatusBadge(label: tr('statusAccepted'), color: AppColors.success);
-      case OrderStatus.inProgress:
+      case ServiceStatus.inProgress:
         return StatusBadge(label: tr('statusInProgress'), color: AppColors.warning);
-      case OrderStatus.completed:
+      case ServiceStatus.completed:
         return StatusBadge(label: tr('statusCompleted'), color: AppColors.primary);
-      case OrderStatus.rejected:
-        return StatusBadge(label: tr('statusRejected'), color: AppColors.offline);
+      case ServiceStatus.canceled:
+        return StatusBadge(label: tr('statusCanceled'), color: AppColors.offline);
     }
   }
 }
@@ -55,16 +56,18 @@ class OrderStatusBadge extends StatelessWidget {
 class PriorityBadge extends StatelessWidget {
   const PriorityBadge({super.key, required this.priority});
 
-  final OrderPriority priority;
+  final ServicePriority priority;
 
   @override
   Widget build(BuildContext context) {
     switch (priority) {
-      case OrderPriority.high:
+      case ServicePriority.urgent:
+        return StatusBadge(label: tr('priorityUrgent'), color: AppColors.danger);
+      case ServicePriority.high:
         return StatusBadge(label: tr('priorityHigh'), color: AppColors.danger);
-      case OrderPriority.medium:
+      case ServicePriority.medium:
         return StatusBadge(label: tr('priorityMedium'), color: AppColors.warning);
-      case OrderPriority.low:
+      case ServicePriority.low:
         return StatusBadge(label: tr('priorityLow'), color: AppColors.offline);
     }
   }
@@ -184,13 +187,14 @@ class SyncBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final app = AppState.instance;
-    final offline = app.isOffline;
-    final color = offline ? AppColors.offline : AppColors.success;
+    final store = ServiceRequestStore.instance;
+    final offline = store.isOfflineNow;
+    final queued = store.pending.length;
+    final color = offline || queued > 0 ? AppColors.offline : AppColors.success;
     final text = message ??
-        (offline
-            ? '${tr('offlineQueue')} ${app.pendingSync.length}'
-            : '${tr('allSynced')} · ${app.lastSync}');
+        (offline || queued > 0
+            ? '${offline ? tr('noConnection') : tr('syncing')} · ${tr('offlineQueue')} $queued'
+            : '${tr('allSynced')} · ${formatTime(store.lastSync)}');
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -210,22 +214,22 @@ class SyncBanner extends StatelessWidget {
 class StatusStepper extends StatelessWidget {
   const StatusStepper({super.key, required this.status});
 
-  final OrderStatus status;
+  final ServiceStatus status;
 
   @override
   Widget build(BuildContext context) {
     final steps = [tr('statusPending'), tr('statusAccepted'), tr('statusInProgress'), tr('statusCompleted')];
     final current = switch (status) {
-      OrderStatus.pending || OrderStatus.rejected => 0,
-      OrderStatus.accepted => 1,
-      OrderStatus.inProgress => 2,
-      OrderStatus.completed => 3,
+      ServiceStatus.pending || ServiceStatus.canceled => 0,
+      ServiceStatus.accepted => 1,
+      ServiceStatus.inProgress => 2,
+      ServiceStatus.completed => 3,
     };
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: List.generate(steps.length, (i) {
-        final done = i < current || status == OrderStatus.completed;
-        final now = i == current && status != OrderStatus.completed;
+        final done = i < current || status == ServiceStatus.completed;
+        final now = i == current && status != ServiceStatus.completed;
         return Expanded(
           child: Column(children: [
             Container(
