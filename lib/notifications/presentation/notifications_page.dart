@@ -22,12 +22,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   void _open(AppNotification n) {
     AppState.instance.markAsRead(n);
-    final target = n.targetId;
-    if (target == null) return;
+    // Mock notices until step 5: their targets may not exist in the backend.
+    final id = int.tryParse(n.targetId?.replaceAll(RegExp(r'\D'), '') ?? '');
+    if (id == null) return;
     final route = n.kind == NotificationKind.alert
-        ? MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: target))
-        : MaterialPageRoute(
-            builder: (_) => OrderDetailPage(requestId: int.tryParse(target.replaceAll(RegExp(r'\D'), '')) ?? 0));
+        ? MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: id))
+        : MaterialPageRoute(builder: (_) => OrderDetailPage(requestId: id));
     Navigator.of(context).push(route);
   }
 

@@ -36,7 +36,11 @@ class ProfilePage extends StatelessWidget {
         TextButton(
           onPressed: () {
             messenger.hideCurrentMaterialBanner();
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EquipmentPage(equipmentId: 'FH-02')));
+            // Demo only: opens the unit of the first active order (real pushes arrive in step 5).
+            final active = ServiceRequestStore.instance.requests.where((r) => r.isActive);
+            if (active.isEmpty) return;
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: active.first.equipmentId)));
           },
           child: Text(tr('open')),
         ),

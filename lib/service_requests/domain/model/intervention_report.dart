@@ -23,3 +23,22 @@ class InterventionReport {
 
 /// Result of submitting an intervention.
 enum SubmitResult { sent, queued }
+
+/// Intervention already stored by the backend, shown in the equipment history (US-33).
+class InterventionRecord {
+  const InterventionRecord({
+    required this.serviceRequestId,
+    required this.diagnosis,
+    required this.actionsTaken,
+    required this.spareParts,
+    this.completedAt,
+    this.durationSeconds,
+  });
+
+  final int serviceRequestId;
+  final String diagnosis;
+  final String actionsTaken;
+  final List<String> spareParts;
+  final DateTime? completedAt;
+  final int? durationSeconds;
+}

@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 
-import '../../monitoring/domain/equipment.dart';
+import '../../monitoring/application/monitoring_store.dart';
 import '../../notifications/domain/app_notification.dart';
 import '../../service_requests/application/service_request_store.dart';
 import '../../shared/data/mock_data.dart';
 
-/// In-memory UI state. Orders, equipment, alerts and notifications are still mock data;
-/// they are replaced by backend calls in the next integration steps.
+/// In-memory UI state: language, technician name, simulated offline switch and
+/// (still mock) notifications. Backend data lives in the stores of each context.
 class AppState extends ChangeNotifier {
   AppState._();
 
@@ -21,8 +21,6 @@ class AppState extends ChangeNotifier {
   bool isAlertPushEnabled = true;
   bool isAssignmentPushEnabled = true;
 
-  final Map<String, Equipment> equipment = MockData.equipment();
-  final List<EquipmentAlert> alerts = MockData.alerts();
   final List<AppNotification> notifications = MockData.notifications();
 
   int get unreadCount => notifications.where((n) => !n.isRead).length;
@@ -80,8 +78,8 @@ class AppState extends ChangeNotifier {
   }
 }
 
-/// Rebuilds its child whenever the UI state or the service requests change.
-final Listenable _listenable = Listenable.merge([AppState.instance, ServiceRequestStore.instance]);
+/// Rebuilds its child whenever the UI state, the service requests or the alerts change.
+final Listenable _listenable = Listenable.merge([AppState.instance, ServiceRequestStore.instance, MonitoringStore.instance]);
 
 class Watch extends StatelessWidget {
   const Watch({super.key, required this.builder});

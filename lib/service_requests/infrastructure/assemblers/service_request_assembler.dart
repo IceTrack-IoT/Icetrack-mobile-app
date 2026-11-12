@@ -74,4 +74,13 @@ class ServiceRequestAssembler {
         photoEvidence: report.photoEvidence,
         completedAt: isoUtc(report.completedAt),
       );
+
+  static InterventionRecord toRecord(InterventionResource r) => InterventionRecord(
+        serviceRequestId: r.serviceRequestId,
+        diagnosis: r.diagnosis,
+        actionsTaken: r.actionsTaken,
+        spareParts: r.spareParts,
+        completedAt: parseInstant(r.completedAt),
+        durationSeconds: r.durationSeconds,
+      );
 }

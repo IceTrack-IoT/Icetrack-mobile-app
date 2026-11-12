@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../../assets/application/assets_service.dart';
+import '../../assets/domain/model/equipment.dart';
+import '../../assets/domain/model/site.dart';
 import '../../core/i18n/app_strings.dart';
 import '../../core/i18n/date_format.dart';
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
+import '../../monitoring/presentation/equipment_page.dart';
 import '../../shared/infrastructure/api_exception.dart';
 import '../../shared/presentation/error_text.dart';
+import '../../shared/presentation/launcher.dart';
 import '../application/service_request_store.dart';
 import '../domain/model/service_request.dart';
 import 'intervention_page.dart';
@@ -29,6 +34,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   bool _loading = true;
   bool _busy = false;
   Object? _error;
+  Site? _site;
+  Equipment? _equipment;
+
+  Future<void> _navigate(Site site) async {
+    final url = site.navigationUrl ??
+        (site.hasLocation ? directionsUrl(site.latitude!, site.longitude!) : null);
+    final opened = url != null && await openNavigation(url);
+    if (!opened && mounted) _snack(tr('mapsUnavailable'), isError: true);
+  }
 
   @override
   void initState() {
@@ -46,7 +60,20 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       _error = null;
     });
     try {
-      await _store.load(widget.requestId);
+      final request = await _store.load(widget.requestId);
+      // Site and unit are readable only while the order is active (404 otherwise).
+      if (request.isActive) {
+        final results = await Future.wait([
+          AssetsService.instance.site(request.siteId),
+          AssetsService.instance.equipment(request.equipmentId),
+        ]);
+        if (mounted) {
+          setState(() {
+            _site = results[0] as Site;
+            _equipment = results[1] as Equipment;
+          });
+        }
+      }
     } catch (e) {
       if (mounted) setState(() => _error = e);
     } finally {
@@ -144,7 +171,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               const SizedBox(height: 14),
               AppCard(
                 child: Column(children: [
-                  KeyValueRow(icon: Icons.place_outlined, label: tr('site'), value: request.siteName ?? '—'),
+                  KeyValueRow(
+                      icon: Icons.place_outlined,
+                      label: tr('site'),
+                      value: [request.siteName ?? '—', if (_site != null && _site!.address.isNotEmpty) _site!.address]
+                          .join(' · ')),
                   const SizedBox(height: 14),
                   KeyValueRow(
                       icon: Icons.calendar_today_outlined,
@@ -197,6 +228,18 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   ],
                 ]),
               ),
+              if (_site != null && request.isActive) ...[
+                const SizedBox(height: 14),
+                _SiteCard(site: _site!, onNavigate: () => _navigate(_site!), onCall: () => callPhone(_site!.phone)),
+              ],
+              if (request.isActive) ...[
+                const SizedBox(height: 14),
+                _EquipmentCard(
+                  equipment: _equipment,
+                  onTap: () => Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: request.equipmentId))),
+                ),
+              ],
             ],
           ),
         ),
@@ -313,6 +356,89 @@ class _RejectDialogState extends State<_RejectDialog> {
           child: Text(tr('reject')),
         ),
       ],
+    );
+  }
+}
+
+/// Site of the order with its contact and the "How to get there" button (US-47).
+class _SiteCard extends StatelessWidget {
+  const _SiteCard({required this.site, required this.onNavigate, required this.onCall});
+
+  final Site site;
+  final VoidCallback onNavigate;
+  final VoidCallback onCall;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return AppCard(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          const IconCircle(icon: Icons.storefront_outlined, color: AppColors.primary, size: 40),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(site.name, style: text.titleMedium),
+              Text(site.address, style: text.bodySmall),
+            ]),
+          ),
+        ]),
+        if (site.contactName.isNotEmpty || site.phone.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          InkWell(
+            onTap: site.phone.isEmpty ? null : onCall,
+            child: KeyValueRow(
+              icon: Icons.phone_outlined,
+              label: tr('contact'),
+              value: [site.contactName, site.phone].where((v) => v.isNotEmpty).join(' · '),
+            ),
+          ),
+        ],
+        const SizedBox(height: 14),
+        OutlinedButton.icon(
+          onPressed: site.navigationUrl != null || site.hasLocation ? onNavigate : null,
+          icon: const Icon(Icons.directions_outlined),
+          label: Text(tr('howToGetThere')),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Current temperature of the unit; opens the equipment screen.
+class _EquipmentCard extends StatelessWidget {
+  const _EquipmentCard({required this.equipment, required this.onTap});
+
+  final Equipment? equipment;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final eq = equipment;
+    final color = eq == null
+        ? AppColors.textSubtle
+        : eq.isSilent
+            ? AppColors.offline
+            : (eq.isOutOfRange ? AppColors.danger : AppColors.success);
+    return AppCard(
+      onTap: onTap,
+      child: Row(children: [
+        IconCircle(icon: Icons.thermostat, color: color, size: 44),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(tr('currentTemp'), style: text.bodySmall),
+            Text(formatTemp(eq?.lastKnownTemperature), style: AppTheme.numeric(size: 20, color: color)),
+            if (eq != null)
+              Text(
+                '${tr('range')} ${formatTemp(eq.minCelsius)} – ${formatTemp(eq.maxCelsius)} · ${formatTime(eq.lastReadingAt)}',
+                style: text.bodySmall,
+              ),
+          ]),
+        ),
+        const Icon(Icons.chevron_right, color: AppColors.textSubtle),
+      ]),
     );
   }
 }

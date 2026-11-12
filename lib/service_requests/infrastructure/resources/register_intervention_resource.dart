@@ -40,3 +40,31 @@ class RegisterInterventionResource {
         if (completedAt != null) 'completed_at': completedAt,
       };
 }
+
+/// `InterventionResource` (response of `GET /assets/equipments/{id}/interventions`).
+class InterventionResource {
+  const InterventionResource({
+    required this.serviceRequestId,
+    required this.diagnosis,
+    required this.actionsTaken,
+    required this.spareParts,
+    this.completedAt,
+    this.durationSeconds,
+  });
+
+  factory InterventionResource.fromJson(Map<String, dynamic> json) => InterventionResource(
+        serviceRequestId: (json['service_request_id'] as num?)?.toInt() ?? 0,
+        diagnosis: json['diagnosis'] as String? ?? '',
+        actionsTaken: json['actions_taken'] as String? ?? '',
+        spareParts: (json['spare_parts'] as List<dynamic>? ?? const []).cast<String>(),
+        completedAt: json['completed_at'] as String?,
+        durationSeconds: (json['duration_seconds'] as num?)?.toInt(),
+      );
+
+  final int serviceRequestId;
+  final String diagnosis;
+  final String actionsTaken;
+  final List<String> spareParts;
+  final String? completedAt;
+  final int? durationSeconds;
+}

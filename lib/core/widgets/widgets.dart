@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../monitoring/domain/equipment.dart';
+import '../../monitoring/domain/model/equipment_health.dart';
 import '../../service_requests/application/service_request_store.dart';
 import '../../service_requests/domain/model/service_request.dart';
 import '../i18n/date_format.dart';

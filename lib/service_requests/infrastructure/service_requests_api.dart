@@ -44,4 +44,10 @@ class ServiceRequestsApi {
   Future<void> registerIntervention(RegisterInterventionResource resource) async {
     await _client.post('/interventions', body: resource.toJson());
   }
+
+  /// Interventions already registered on a unit (newest data for the equipment history).
+  Future<List<InterventionResource>> interventionsOfEquipment(int equipmentId) async {
+    final json = await _client.get('/assets/equipments/$equipmentId/interventions');
+    return (json as List<dynamic>).map((e) => InterventionResource.fromJson(e as Map<String, dynamic>)).toList();
+  }
 }

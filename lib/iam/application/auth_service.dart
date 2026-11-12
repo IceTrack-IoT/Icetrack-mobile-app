@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../core/state/app_state.dart';
+import '../../monitoring/application/monitoring_store.dart';
 import '../../profiles/domain/model/technician_profile.dart';
 import '../../profiles/infrastructure/assemblers/technician_profile_assembler.dart';
 import '../../profiles/infrastructure/profiles_api.dart';
@@ -92,6 +93,7 @@ class AuthService extends ChangeNotifier {
     profile = null;
     AppState.instance.clearTechnician();
     await ServiceRequestStore.instance.reset();
+    MonitoringStore.instance.reset();
     notifyListeners();
   }
 
