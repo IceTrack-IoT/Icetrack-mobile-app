@@ -10,7 +10,7 @@ import '../../shared/presentation/error_text.dart';
 import '../application/service_request_store.dart';
 import '../domain/model/intervention_report.dart';
 
-/// Screen 07 · Register intervention, also offline (US-31). Sends `POST /interventions`;
+/// Screen 07: Register intervention, also offline (US-31). Sends `POST /interventions`;
 /// without connection the report is stored on the phone and replayed later.
 class InterventionPage extends StatefulWidget {
   const InterventionPage({super.key, required this.requestId});

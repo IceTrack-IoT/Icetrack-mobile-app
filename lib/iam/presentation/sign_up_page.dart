@@ -9,7 +9,7 @@ import '../application/auth_service.dart';
 import '../infrastructure/resources/sign_up_technician_resource.dart';
 import 'sign_in_page.dart';
 
-/// Screen 02 · Technician sign up (US-01, US-34).
+/// Screen 02: Technician sign up (US-01, US-34).
 /// Creates the account with `POST /authentication/sign-up/technician` and signs in right after.
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -39,7 +39,7 @@ class _SignUpPageState extends State<SignUpPage> {
   static final _usernamePattern = RegExp(r'^[A-Za-z0-9._]{4,30}$');
   static final _emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
   static final _passwordPattern = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,64}$');
-  static final _certificationPattern = RegExp(r'^[A-Za-z0-9./-]{3,50}$');
+  static final _certificationPattern = RegExp(r'^[A-Za-z0-9][A-Za-z0-9./-]{2,49}$');
 
   @override
   void dispose() {

@@ -97,6 +97,13 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Called by the Profiles context after the technician edits the profile (US-07).
+  void replaceProfile(TechnicianProfile updated) {
+    profile = updated;
+    AppState.instance.setTechnician(name: updated.fullName, speciality: updated.speciality);
+    notifyListeners();
+  }
+
   Future<void> _loadProfile() async {
     final resource = await _profilesApi.getTechnicianByUserId(user!.id);
     profile = TechnicianProfileAssembler.toEntity(resource);

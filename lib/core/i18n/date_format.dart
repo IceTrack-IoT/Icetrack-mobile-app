@@ -12,7 +12,7 @@ String formatTime(DateTime? moment) {
   return '${_two(local.hour)}:${_two(local.minute)}';
 }
 
-/// `11 nov · 09:42` in the technician's local time.
+/// Date and time in the technician's local time, for example `11 nov · 09:42`.
 String formatDateTime(DateTime? moment) {
   if (moment == null) return '—';
   final local = moment.toLocal();

@@ -23,7 +23,7 @@ String equipmentTypeLabel(EquipmentType type) => switch (type) {
       EquipmentType.other => tr('typeOther'),
     };
 
-/// Screen 06 · Equipment and telemetry in the field (US-27, US-33).
+/// Screen 06: Equipment and telemetry in the field (US-27, US-33).
 /// Unit, last hours of temperature, open alerts and past interventions from the backend.
 class EquipmentPage extends StatefulWidget {
   const EquipmentPage({super.key, required this.equipmentId});

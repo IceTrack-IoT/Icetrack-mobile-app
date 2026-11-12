@@ -11,7 +11,7 @@ import '../application/service_request_store.dart';
 import '../domain/model/service_request.dart';
 import 'order_detail_page.dart';
 
-/// Screen 03 · Assigned orders (US-30, US-44), loaded from `GET /service-requests?assigned_to=me`.
+/// Screen 03: Assigned orders (US-30, US-44), loaded from `GET /service-requests?assigned_to=me`.
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
 

@@ -20,7 +20,7 @@ String healthLabel(EquipmentHealth h) => switch (h) {
       EquipmentHealth.normal => tr('inRange'),
     };
 
-/// Screen 12 · Active alerts of the units in my active orders (US-32).
+/// Screen 12: Active alerts of the units in my active orders (US-32).
 /// Reads `GET /alerts/equipment/{id}/open` for each unit of an active order.
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});

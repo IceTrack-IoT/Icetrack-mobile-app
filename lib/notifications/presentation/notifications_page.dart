@@ -9,7 +9,7 @@ import '../../monitoring/presentation/equipment_page.dart';
 import '../../service_requests/presentation/order_detail_page.dart';
 import '../domain/app_notification.dart';
 
-/// Screen 09 · Notification center filtered by role (US-43, US-44).
+/// Screen 09: Notification center filtered by role (US-43, US-44).
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
 

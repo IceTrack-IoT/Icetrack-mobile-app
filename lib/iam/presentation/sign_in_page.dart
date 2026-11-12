@@ -9,7 +9,7 @@ import '../../shared/presentation/home_shell.dart';
 import '../application/auth_service.dart';
 import 'sign_up_page.dart';
 
-/// Screen 01 · Sign in (US-46, US-02, US-34, US-23).
+/// Screen 01: Sign in (US-46, US-02, US-34, US-23).
 /// Signs in against the backend with `channel: MOBILE` (technicians only).
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key, this.sessionExpired = false});
@@ -187,21 +187,25 @@ class LanguageDropdown extends StatelessWidget {
         border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: app.languageCode,
-          dropdownColor: AppColors.primaryDark,
-          iconEnabledColor: Colors.white,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-          items: const [
-            DropdownMenuItem(value: 'es', child: Text('🌐  Español')),
-            DropdownMenuItem(value: 'en', child: Text('🌐  English')),
-          ],
-          onChanged: (value) {
-            if (value != null) app.setLanguage(value);
-          },
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.language, color: Colors.white, size: 18),
+        const SizedBox(width: 6),
+        DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: app.languageCode,
+            dropdownColor: AppColors.primaryDark,
+            iconEnabledColor: Colors.white,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            items: const [
+              DropdownMenuItem(value: 'es', child: Text('Español')),
+              DropdownMenuItem(value: 'en', child: Text('English')),
+            ],
+            onChanged: (value) {
+              if (value != null) app.setLanguage(value);
+            },
+          ),
         ),
-      ),
+      ]),
     );
   }
 }

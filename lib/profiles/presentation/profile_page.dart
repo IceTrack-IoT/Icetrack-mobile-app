@@ -10,8 +10,9 @@ import '../../iam/application/auth_service.dart';
 import '../../iam/presentation/sign_in_page.dart';
 import '../../monitoring/presentation/equipment_page.dart';
 import '../../service_requests/application/service_request_store.dart';
+import 'edit_profile_page.dart';
 
-/// Screen 10 · Profile, language and sync (US-23, US-46).
+/// Screen 10: Profile, language and sync (US-23, US-46).
 /// Also hosts demo triggers for the push alert (08) and expired session (11).
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -100,7 +101,20 @@ class ProfilePage extends StatelessWidget {
                   Text('${tr('technician')} · ${app.technicianSpeciality}', style: text.bodyMedium?.copyWith(color: AppColors.textMuted)),
                   const SizedBox(height: 4),
                   Text(AuthService.instance.profile?.email ?? '', style: text.bodySmall),
+                  if ((AuthService.instance.profile?.phone ?? '').isNotEmpty)
+                    Text(AuthService.instance.profile!.phone, style: text.bodySmall),
+                  if ((AuthService.instance.profile?.certificationNumber ?? '').isNotEmpty)
+                    Text('${tr('certificationNumber')}: ${AuthService.instance.profile!.certificationNumber}',
+                        style: text.bodySmall),
                 ]),
+              ),
+              IconButton(
+                tooltip: tr('editProfile'),
+                icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                onPressed: AuthService.instance.profile == null
+                    ? null
+                    : () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => EditProfilePage(profile: AuthService.instance.profile!))),
               ),
             ]),
           ),

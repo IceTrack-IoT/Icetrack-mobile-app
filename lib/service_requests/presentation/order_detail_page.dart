@@ -18,7 +18,7 @@ import '../domain/model/service_request.dart';
 import 'intervention_page.dart';
 import 'orders_page.dart';
 
-/// Screens 04 and 05 · Order detail, acceptance and arrival (US-30, US-33).
+/// Screens 04 and 05: Order detail, acceptance and arrival (US-30, US-33).
 /// Reads `GET /service-requests/{id}` and changes the state with accept / reject / start.
 class OrderDetailPage extends StatefulWidget {
   const OrderDetailPage({super.key, required this.requestId});

@@ -8,6 +8,11 @@ String tr(String key) {
 
 const Map<String, Map<String, String>> _strings = {
   'es': {
+    'editProfile': 'Editar perfil',
+    'editProfileIntro': 'Mantén al día tu especialidad y certificación: los propietarios las usan para asignarte servicios.',
+    'emailReadOnly': 'El correo pertenece a tu cuenta y no se puede cambiar.',
+    'saveChanges': 'Guardar cambios',
+    'profileSaved': 'Perfil actualizado.',
     'typeDisplayCase': 'Vitrina exhibidora',
     'typeColdRoom': 'Cámara de frío',
     'typeRefrigerator': 'Refrigerador',
@@ -64,7 +69,7 @@ const Map<String, Map<String, String>> _strings = {
     'usernameInvalid': 'De 4 a 30 caracteres: letras, dígitos, punto o guion bajo.',
     'emailInvalid': 'Ingresa un correo válido.',
     'passwordInvalid': 'De 8 a 64 caracteres, con al menos una mayúscula, una minúscula y un dígito.',
-    'certificationInvalid': 'De 3 a 50 caracteres: letras, dígitos, guion, punto o barra.',
+    'certificationInvalid': 'De 3 a 50 caracteres (letras, dígitos, guion, punto o barra), empezando por letra o dígito.',
     'fieldRequired': 'Este campo es obligatorio.',
     'sectionAccount': 'Cuenta',
     'sectionProfessional': 'Datos profesionales',
@@ -209,6 +214,11 @@ const Map<String, Map<String, String>> _strings = {
     'open': 'Abrir',
   },
   'en': {
+    'editProfile': 'Edit profile',
+    'editProfileIntro': 'Keep your speciality and certification up to date: owners use them to assign you services.',
+    'emailReadOnly': 'The email belongs to your account and cannot be changed.',
+    'saveChanges': 'Save changes',
+    'profileSaved': 'Profile updated.',
     'typeDisplayCase': 'Display case',
     'typeColdRoom': 'Cold room',
     'typeRefrigerator': 'Refrigerator',
@@ -265,7 +275,7 @@ const Map<String, Map<String, String>> _strings = {
     'usernameInvalid': '4 to 30 characters: letters, digits, dot or underscore.',
     'emailInvalid': 'Enter a valid email.',
     'passwordInvalid': '8 to 64 characters with at least one uppercase letter, one lowercase letter and one digit.',
-    'certificationInvalid': '3 to 50 characters: letters, digits, dash, dot or slash.',
+    'certificationInvalid': '3 to 50 characters (letters, digits, dash, dot or slash), starting with a letter or digit.',
     'fieldRequired': 'This field is required.',
     'sectionAccount': 'Account',
     'sectionProfessional': 'Professional details',

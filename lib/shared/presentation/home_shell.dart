@@ -8,7 +8,7 @@ import '../../notifications/presentation/notifications_page.dart';
 import '../../profiles/presentation/profile_page.dart';
 import '../../service_requests/presentation/orders_page.dart';
 
-/// Bottom navigation: Orders · Alerts · Notices · Profile.
+/// Bottom navigation with the Orders, Alerts, Notices and Profile tabs.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
