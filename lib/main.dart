@@ -1,14 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
+import 'firebase_options.dart';
 import 'iam/application/auth_service.dart';
 import 'iam/presentation/session_gate.dart';
 import 'iam/presentation/sign_in_page.dart';
 import 'shared/infrastructure/api_client.dart';
 import 'shared/presentation/app_navigator.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   ApiClient.instance.onSessionExpired = _onSessionExpired;
   runApp(const IceTrackApp());
 }
