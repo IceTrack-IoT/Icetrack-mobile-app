@@ -50,4 +50,8 @@ class ServiceRequestsApi {
     final json = await _client.get('/assets/equipments/$equipmentId/interventions');
     return (json as List<dynamic>).map((e) => InterventionResource.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  /// Issues a new gateway grant (revoking the previous one) for an ACCEPTED or IN_PROGRESS request.
+  Future<EdgeGrantResource> regenerateEdgeGrant(int id) async =>
+      EdgeGrantResource.fromJson(await _client.post('/service-requests/$id/edge-grant') as Map<String, dynamic>);
 }

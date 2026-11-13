@@ -9,6 +9,7 @@ import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
+import '../../device/presentation/gateway_tools_page.dart';
 import '../../monitoring/presentation/equipment_page.dart';
 import '../../shared/infrastructure/api_exception.dart';
 import '../../shared/presentation/error_text.dart';
@@ -238,6 +239,23 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   equipment: _equipment,
                   onTap: () => Navigator.of(context)
                       .push(MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: request.equipmentId))),
+                ),
+              ],
+              if (!queued &&
+                  (request.status == ServiceStatus.accepted || request.status == ServiceStatus.inProgress)) ...[
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => GatewayToolsPage(
+                      requestId: request.id,
+                      siteId: request.siteId,
+                      equipmentId: request.equipmentId,
+                      equipmentName: request.equipmentName ?? '${tr('equipment')} #${request.equipmentId}',
+                      defaultDeviceUid: _equipment?.uid,
+                    ),
+                  )),
+                  icon: const Icon(Icons.router_outlined),
+                  label: Text(tr('gatewayTools')),
                 ),
               ],
             ],

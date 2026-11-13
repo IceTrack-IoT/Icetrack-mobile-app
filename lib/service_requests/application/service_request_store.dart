@@ -120,6 +120,19 @@ class ServiceRequestStore extends ChangeNotifier {
     return SubmitResult.sent;
   }
 
+  /// Token that lets the technician operate the on-site gateway (US-40, US-48, US-49).
+  /// It is shown by the backend only once, when accepting; if it was lost, a new one is issued.
+  Future<String> edgeGrant(int requestId, {bool renew = false}) async {
+    if (!renew) {
+      final stored = await _edgeGrants.read(requestId);
+      if (stored != null && stored.isNotEmpty) return stored;
+    }
+    _ensureOnline();
+    final grant = await _api.regenerateEdgeGrant(requestId);
+    await _edgeGrants.save(requestId, grant.token);
+    return grant.token;
+  }
+
   /// Manual "Sync now" (profile) or automatic after reconnecting.
   Future<void> syncNow() => refresh();
 
