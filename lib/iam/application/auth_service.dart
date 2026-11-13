@@ -14,11 +14,17 @@ import '../../shared/infrastructure/token_storage.dart';
 import '../domain/model/authenticated_user.dart';
 import '../infrastructure/assemblers/authenticated_user_assembler.dart';
 import '../infrastructure/authentication_api.dart';
+import '../infrastructure/google_identity.dart';
+import '../infrastructure/resources/authenticated_user_resource.dart';
+import '../infrastructure/resources/google_resources.dart';
 import '../infrastructure/resources/sign_in_resource.dart';
 import '../infrastructure/resources/sign_up_technician_resource.dart';
 
+/// Result of "Continue with Google" (US-34, US-46).
+enum GoogleSignInOutcome { signedIn, needsRegistration, needsLink, canceled }
+
 /// Application service of the IAM context for the technician app:
-/// sign in, sign up, restore the session on start and sign out (US-01, US-02).
+/// sign in, sign up, Google sign-in, restore the session on start and sign out (US-01, US-02, US-34).
 class AuthService extends ChangeNotifier {
   AuthService._();
 
@@ -27,6 +33,10 @@ class AuthService extends ChangeNotifier {
   final AuthenticationApi _authApi = AuthenticationApi();
   final ProfilesApi _profilesApi = ProfilesApi();
   final TokenStorage _tokens = TokenStorage.instance;
+  final GoogleIdentityProvider _google = GoogleIdentityProvider();
+
+  /// Google account waiting for the registration form or for the link password.
+  GoogleIdentity? pendingGoogle;
 
   AuthenticatedUser? user;
   TechnicianProfile? profile;
@@ -39,6 +49,75 @@ class AuthService extends ChangeNotifier {
       password: password,
       channel: ApiConfig.channel,
     ));
+    await _tokens.save(accessToken: resource.token, refreshToken: resource.refreshToken);
+    user = AuthenticatedUserAssembler.fromAuthenticatedResource(resource);
+    await _loadProfile();
+  }
+
+  /// Opens the Google account picker and signs in with the backend.
+  Future<GoogleSignInOutcome> signInWithGoogle() async {
+    final identity = await _google.signIn();
+    if (identity == null) return GoogleSignInOutcome.canceled;
+    try {
+      await _startSession(await _authApi.googleVerify(
+        SignInWithGoogleResource(idToken: identity.idToken, channel: ApiConfig.channel),
+      ));
+      pendingGoogle = null;
+      return GoogleSignInOutcome.signedIn;
+    } on ApiException catch (e) {
+      if (e.code == 'GOOGLE_ACCOUNT_NOT_FOUND') {
+        pendingGoogle = identity;
+        return GoogleSignInOutcome.needsRegistration;
+      }
+      if (e.code == 'ACCOUNT_LINK_REQUIRED') {
+        pendingGoogle = identity;
+        return GoogleSignInOutcome.needsLink;
+      }
+      await _google.signOut();
+      rethrow;
+    }
+  }
+
+  /// New Google user: creates the technician account with the form data.
+  Future<void> completeGoogleRegistration({
+    required String username,
+    required String phone,
+    required String street,
+    String? number,
+    required String city,
+    required String postalCode,
+    required String country,
+    required String speciality,
+    required String certificationNumber,
+  }) async {
+    final identity = pendingGoogle!;
+    await _startSession(await _authApi.googleCompleteTechnicianRegistration(
+      CompleteGoogleTechnicianRegistrationResource(
+        idToken: identity.idToken,
+        username: username,
+        phone: phone,
+        street: street,
+        number: number,
+        city: city,
+        postalCode: postalCode,
+        country: country,
+        speciality: speciality,
+        certificationNumber: certificationNumber,
+      ),
+    ));
+    pendingGoogle = null;
+  }
+
+  /// The Google email already has an account with a password: links both after checking it.
+  Future<void> linkGoogle(String password) async {
+    final identity = pendingGoogle!;
+    await _startSession(await _authApi.googleLink(
+      LinkGoogleAccountResource(idToken: identity.idToken, password: password, channel: ApiConfig.channel),
+    ));
+    pendingGoogle = null;
+  }
+
+  Future<void> _startSession(AuthenticatedUserResource resource) async {
     await _tokens.save(accessToken: resource.token, refreshToken: resource.refreshToken);
     user = AuthenticatedUserAssembler.fromAuthenticatedResource(resource);
     await _loadProfile();
@@ -86,6 +165,11 @@ class AuthService extends ChangeNotifier {
       } on ApiException {
         // Logout is best effort: the local session is discarded anyway.
       }
+    }
+    try {
+      await _google.signOut();
+    } catch (_) {
+      // Not signed in with Google on this phone.
     }
     await clearLocalSession();
   }

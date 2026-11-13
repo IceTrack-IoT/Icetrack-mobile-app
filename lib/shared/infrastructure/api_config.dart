@@ -14,6 +14,13 @@ class ApiConfig {
   /// The mobile app always signs in through the MOBILE channel (TECHNICIAN_ROLE).
   static const String channel = 'MOBILE';
 
+  /// OAuth client the backend accepts in Google ID tokens (`GOOGLE_CLIENT_ID` on Railway).
+  /// It is a public identifier, not a secret.
+  static const String googleServerClientId = String.fromEnvironment(
+    'GOOGLE_CLIENT_ID',
+    defaultValue: '235296518162-amt44u4ha0908lh9oa5h23lifb5jbi07.apps.googleusercontent.com',
+  );
+
   static const Duration timeout = Duration(seconds: 25);
 
   static Uri uri(String path, [Map<String, String>? query]) {

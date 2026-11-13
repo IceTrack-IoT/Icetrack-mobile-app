@@ -7,6 +7,7 @@ import '../../shared/presentation/error_text.dart';
 import '../../shared/presentation/home_shell.dart';
 import '../application/auth_service.dart';
 import '../infrastructure/resources/sign_up_technician_resource.dart';
+import 'google_flow.dart';
 import 'sign_in_page.dart';
 
 /// Screen 02: Technician sign up (US-01, US-34).
@@ -92,6 +93,19 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  Future<void> _google() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final error = await continueWithGoogle(context);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
+  }
+
   Widget _field(
     String labelKey,
     TextEditingController controller,
@@ -175,10 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
             const SizedBox(height: 12),
             GoogleButton(
               label: tr('signUpGoogle'),
-              onPressed: _loading
-                  ? null
-                  : () => ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(tr('googleComingSoon')))),
+              onPressed: _loading ? null : _google,
             ),
           ]),
         ),

@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../shared/presentation/error_text.dart';
 import '../../shared/presentation/home_shell.dart';
 import '../application/auth_service.dart';
+import 'google_flow.dart';
 import 'sign_up_page.dart';
 
 /// Screen 01: Sign in (US-46, US-02, US-34, US-23).
@@ -57,8 +58,17 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
-  void _googleNotReady() {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr('googleComingSoon'))));
+  Future<void> _google() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    final error = await continueWithGoogle(context);
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _error = error;
+    });
   }
 
   @override
@@ -103,7 +113,7 @@ class _SignInPageState extends State<SignInPage> {
                       FormMessage(text: tr('sessionExpiredBody'), isError: false),
                     ],
                     const SizedBox(height: 20),
-                    GoogleButton(label: tr('continueGoogle'), onPressed: _loading ? null : _googleNotReady),
+                    GoogleButton(label: tr('continueGoogle'), onPressed: _loading ? null : _google),
                     const SizedBox(height: 16),
                     Row(children: [
                       const Expanded(child: Divider(color: AppColors.border)),

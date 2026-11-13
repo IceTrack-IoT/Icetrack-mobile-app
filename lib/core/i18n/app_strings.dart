@@ -8,6 +8,12 @@ String tr(String key) {
 
 const Map<String, Map<String, String>> _strings = {
   'es': {
+    'googleError': 'No se pudo iniciar sesión con Google. Inténtalo otra vez.',
+    'googleNotConfigured': 'El ingreso con Google aún no está configurado para esta app (falta registrar la app Android en Google Cloud).',
+    'linkGoogleTitle': 'Vincular tu cuenta de Google',
+    'linkGoogleBody': 'Ya existe una cuenta de IceTrack con {email}. Ingresa su contraseña una vez para vincularla con Google.',
+    'linkGoogleAction': 'Vincular',
+    'googleSignUpIntro': 'Completa tu perfil de técnico. Tu nombre y correo se toman de tu cuenta de Google.',
     'gatewayTools': 'Herramientas en sitio',
     'gatewayIntro': 'Conéctate al Wi-Fi del local para comunicarte con el gateway. Funciona aunque el local no tenga internet.',
     'gatewayConnection': 'Conexión con el gateway',
@@ -146,7 +152,6 @@ const Map<String, Map<String, String>> _strings = {
     'city': 'Ciudad',
     'postalCode': 'Código postal',
     'country': 'País',
-    'googleComingSoon': 'El ingreso con Google se habilitará en una próxima versión.',
     'errorRequiredCredentials': 'Ingresa tu usuario o correo y tu contraseña.',
     'errorBadCredentials': 'Usuario o contraseña incorrectos.',
     'errorChannel': 'Esta cuenta no es de técnico. Los propietarios ingresan desde la aplicación web.',
@@ -277,6 +282,12 @@ const Map<String, Map<String, String>> _strings = {
     'open': 'Abrir',
   },
   'en': {
+    'googleError': 'Could not sign in with Google. Please try again.',
+    'googleNotConfigured': 'Google sign-in is not configured for this app yet (the Android app must be registered in Google Cloud).',
+    'linkGoogleTitle': 'Link your Google account',
+    'linkGoogleBody': 'An IceTrack account with {email} already exists. Enter its password once to link it with Google.',
+    'linkGoogleAction': 'Link',
+    'googleSignUpIntro': 'Complete your technician profile. Your name and email come from your Google account.',
     'gatewayTools': 'On-site tools',
     'gatewayIntro': 'Join the site Wi-Fi to talk to the gateway. It works even when the site has no internet.',
     'gatewayConnection': 'Gateway connection',
@@ -415,7 +426,6 @@ const Map<String, Map<String, String>> _strings = {
     'city': 'City',
     'postalCode': 'Postal code',
     'country': 'Country',
-    'googleComingSoon': 'Google sign-in will be enabled in an upcoming version.',
     'errorRequiredCredentials': 'Enter your username or email and your password.',
     'errorBadCredentials': 'Incorrect username or password.',
     'errorChannel': 'This is not a technician account. Owners sign in through the web application.',
