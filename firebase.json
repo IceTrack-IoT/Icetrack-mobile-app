@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"icetrack-iot","appId":"1:1005537799897:android:01fb485fbac24dee36d8c8","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"icetrack-iot","configurations":{"android":"1:1005537799897:android:01fb485fbac24dee36d8c8","ios":"1:1005537799897:ios:cb2969e0361ae86d36d8c8"}}}}}}
