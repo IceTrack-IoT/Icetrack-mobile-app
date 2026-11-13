@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import '../../core/i18n/app_strings.dart';
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../core/i18n/date_format.dart';
 import '../../iam/application/auth_service.dart';
 import '../../iam/presentation/sign_in_page.dart';
-import '../../monitoring/presentation/equipment_page.dart';
+import '../../notifications/application/notification_store.dart';
 import '../../service_requests/application/service_request_store.dart';
+import '../../shared/presentation/error_text.dart';
 import 'edit_profile_page.dart';
 
 /// Screen 10: Profile, language and sync (US-23, US-46).
-/// Also hosts demo triggers for the push alert (08) and expired session (11).
+/// Also hosts the demo trigger for the expired session screen (11).
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
@@ -23,30 +23,16 @@ class ProfilePage extends StatelessWidget {
     navigator.pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const SignInPage()), (_) => false);
   }
 
-  void _simulatePush(BuildContext context) {
+  Future<void> _enablePush(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
-    messenger.showMaterialBanner(MaterialBanner(
-      backgroundColor: AppColors.surface,
-      leading: const IconCircle(icon: Icons.ac_unit, color: AppColors.primaryDeep, size: 38),
-      content: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text('ICETRACK · ahora', style: AppTheme.badge(AppColors.textMuted)),
-        Text(tr('pushTitle'), style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w600)),
-        Text(tr('pushBody')),
-      ]),
-      actions: [
-        TextButton(
-          onPressed: () {
-            messenger.hideCurrentMaterialBanner();
-            // Demo only: opens the unit of the first active order (real pushes arrive in step 5).
-            final active = ServiceRequestStore.instance.requests.where((r) => r.isActive);
-            if (active.isEmpty) return;
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => EquipmentPage(equipmentId: active.first.equipmentId)));
-          },
-          child: Text(tr('open')),
-        ),
-      ],
-    ));
+    try {
+      await NotificationStore.instance.enablePush();
+      if (!NotificationStore.instance.pushAllowed) {
+        messenger.showSnackBar(SnackBar(content: Text(tr('pushDeniedHint'))));
+      }
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(errorText(e))));
+    }
   }
 
   void _simulateExpired(BuildContext context) {
@@ -81,6 +67,7 @@ class ProfilePage extends StatelessWidget {
     return Watch(builder: (context) {
       final app = AppState.instance;
       final store = ServiceRequestStore.instance;
+      final notifications = NotificationStore.instance;
       final text = Theme.of(context).textTheme;
       return SafeArea(
         child: ListView(padding: const EdgeInsets.fromLTRB(24, 16, 24, 24), children: [
@@ -154,28 +141,26 @@ class ProfilePage extends StatelessWidget {
           SectionTitle(tr('push')),
           const SizedBox(height: 10),
           AppCard(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Column(children: [
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(tr('pushAlerts')),
-                subtitle: Text(tr('pushAlertsSub')),
-                value: app.isAlertPushEnabled,
-                onChanged: app.setAlertPush,
+            child: Row(children: [
+              IconCircle(
+                icon: notifications.pushAllowed ? Icons.notifications_active_outlined : Icons.notifications_off_outlined,
+                color: notifications.pushAllowed ? AppColors.success : AppColors.offline,
+                size: 40,
               ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(tr('pushOrders')),
-                subtitle: Text(tr('pushOrdersSub')),
-                value: app.isAssignmentPushEnabled,
-                onChanged: app.setAssignmentPush,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(notifications.pushAllowed ? tr('pushOn') : tr('pushOff'),
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(tr('pushScope'), style: text.bodySmall),
+                ]),
               ),
+              if (!notifications.pushAllowed)
+                TextButton(onPressed: () => _enablePush(context), child: Text(tr('enable'))),
             ]),
           ),
           const SizedBox(height: 18),
           SectionTitle(tr('demo')),
-          const SizedBox(height: 10),
-          OutlinedButton.icon(onPressed: () => _simulatePush(context), icon: const Icon(Icons.notifications_active_outlined), label: Text(tr('simulatePush'))),
           const SizedBox(height: 10),
           OutlinedButton.icon(onPressed: () => _simulateExpired(context), icon: const Icon(Icons.lock_clock_outlined), label: Text(tr('simulateExpired'))),
           const SizedBox(height: 18),

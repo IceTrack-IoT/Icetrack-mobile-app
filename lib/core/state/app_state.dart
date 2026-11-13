@@ -1,12 +1,11 @@
 import 'package:flutter/widgets.dart';
 
 import '../../monitoring/application/monitoring_store.dart';
-import '../../notifications/domain/app_notification.dart';
+import '../../notifications/application/notification_store.dart';
 import '../../service_requests/application/service_request_store.dart';
-import '../../shared/data/mock_data.dart';
 
-/// In-memory UI state: language, technician name, simulated offline switch and
-/// (still mock) notifications. Backend data lives in the stores of each context.
+/// In-memory UI state: language, technician name and the simulated offline switch.
+/// Backend data lives in the stores of each context.
 class AppState extends ChangeNotifier {
   AppState._();
 
@@ -18,12 +17,6 @@ class AppState extends ChangeNotifier {
   String technicianSpeciality = '';
   /// "Simulate offline" switch (profile): forces the offline path of US-31 for demos.
   bool isOffline = false;
-  bool isAlertPushEnabled = true;
-  bool isAssignmentPushEnabled = true;
-
-  final List<AppNotification> notifications = MockData.notifications();
-
-  int get unreadCount => notifications.where((n) => !n.isRead).length;
 
   String get technicianInitials {
     final parts = technicianName.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
@@ -54,32 +47,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
     if (!value) ServiceRequestStore.instance.syncNow();
   }
-
-  void setAlertPush(bool value) {
-    isAlertPushEnabled = value;
-    notifyListeners();
-  }
-
-  void setAssignmentPush(bool value) {
-    isAssignmentPushEnabled = value;
-    notifyListeners();
-  }
-
-  void markAsRead(AppNotification notification) {
-    notification.isRead = true;
-    notifyListeners();
-  }
-
-  void markAllAsRead() {
-    for (final n in notifications) {
-      n.isRead = true;
-    }
-    notifyListeners();
-  }
 }
 
-/// Rebuilds its child whenever the UI state, the service requests or the alerts change.
-final Listenable _listenable = Listenable.merge([AppState.instance, ServiceRequestStore.instance, MonitoringStore.instance]);
+/// Rebuilds its child whenever the UI state or any context store changes.
+final Listenable _listenable = Listenable.merge([
+  AppState.instance,
+  ServiceRequestStore.instance,
+  MonitoringStore.instance,
+  NotificationStore.instance,
+]);
 
 class Watch extends StatelessWidget {
   const Watch({super.key, required this.builder});

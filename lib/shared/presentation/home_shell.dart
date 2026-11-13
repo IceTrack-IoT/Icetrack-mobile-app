@@ -4,6 +4,7 @@ import '../../core/i18n/app_strings.dart';
 import '../../core/state/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../monitoring/presentation/alerts_page.dart';
+import '../../notifications/application/notification_store.dart';
 import '../../notifications/presentation/notifications_page.dart';
 import '../../profiles/presentation/profile_page.dart';
 import '../../service_requests/presentation/orders_page.dart';
@@ -20,9 +21,17 @@ class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
   @override
+  void initState() {
+    super.initState();
+    final notifications = NotificationStore.instance;
+    notifications.refresh();
+    notifications.startPush();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Watch(builder: (context) {
-      final unread = AppState.instance.unreadCount;
+      final unread = NotificationStore.instance.unreadCount;
       return Scaffold(
         body: IndexedStack(index: _index, children: const [
           OrdersPage(),

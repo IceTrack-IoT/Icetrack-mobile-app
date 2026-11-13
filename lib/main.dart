@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'iam/application/auth_service.dart';
 import 'iam/presentation/session_gate.dart';
 import 'iam/presentation/sign_in_page.dart';
+import 'notifications/presentation/push_presenter.dart';
 import 'shared/infrastructure/api_client.dart';
 import 'shared/presentation/app_navigator.dart';
 
@@ -15,6 +16,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   ApiClient.instance.onSessionExpired = _onSessionExpired;
+  attachPushPresentation();
   runApp(const IceTrackApp());
 }
 
@@ -36,6 +38,7 @@ class IceTrackApp extends StatelessWidget {
       title: 'IceTrack',
       debugShowCheckedModeBanner: false,
       navigatorKey: appNavigatorKey,
+      scaffoldMessengerKey: appMessengerKey,
       theme: AppTheme.light(),
       home: const SessionGate(),
     );
